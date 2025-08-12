@@ -1,0 +1,90 @@
+version: '3.8'
+
+services:
+  signalling:
+    build: .
+    container_name: pixelstreaming-signalling
+    restart: unless-stopped
+    ports:
+      - "${SIGNALLING_HTTP_PORT:-8080}:8080"       # HTTP API
+      - "${SIGNALLING_STREAMER_PORT:-8888}:8888"   # Streamer WebSocket
+      - "${SIGNALLING_PLAYER_PORT:-8889}:8889"     # Player WebSocket
+      - "${SIGNALLING_SFU_PORT:-8890}:8890"        # SFU WebSocket
+    environment:
+      # Server configuration
+      - SIGNALLING_HOST=0.0.0.0
+      - SIGNALLING_HTTP_PORT=8080
+      - SIGNALLING_STREAMER_PORT=8888
+      - SIGNALLING_PLAYER_PORT=8889
+      - SIGNALLING_SFU_PORT=8890
+      - SIGNALLING_MAX_SUBSCRIBERS=${SIGNALLING_MAX_SUBSCRIBERS:-100}
+      - SIGNALLING_ENABLE_SFU=${SIGNALLING_ENABLE_SFU:-true}
+      
+      # Security configuration
+      - SIGNALLING_ENABLE_AUTH=${SIGNALLING_ENABLE_AUTH:-false}
+      - SIGNALLING_ENABLE_CORS=${SIGNALLING_ENABLE_CORS:-true}
+      - SIGNALLING_RATE_LIMIT=${SIGNALLING_RATE_LIMIT:-60}
+      
+      # Logging configuration
+      - SIGNALLING_LOG_LEVEL=${SIGNALLING_LOG_LEVEL:-INFO}
+      
+      # JVM configuration
+      - JAVA_OPTS=-Xmx1g -Xms512m -XX:+UseG1GC -XX:+UseContainerSupport
+    volumes:
+      - ./logs:/app/logs
+      - ./config:/app/config
+    networks:
+      - pixelstreaming
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Optional: Prometheus for metrics collection
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: pixelstreaming-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    networks:
+      - pixelstreaming
+    profiles:
+      - monitoring
+
+  # Optional: Grafana for metrics visualization
+  grafana:
+    image: grafana/grafana:latest
+    container_name: pixelstreaming-grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+    networks:
+      - pixelstreaming
+    profiles:
+      - monitoring
+
+networks:
+  pixelstreaming:
+    driver: bridge
+
+volumes:
+  prometheus_data:
+  grafana_data:

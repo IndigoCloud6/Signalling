@@ -1,0 +1,79 @@
+# Pixel Streaming Signalling Server Configuration
+signalling:
+  server:
+    host: ${SIGNALLING_HOST:0.0.0.0}
+    streamer-port: ${SIGNALLING_STREAMER_PORT:8888}
+    player-port: ${SIGNALLING_PLAYER_PORT:8889}
+    sfu-port: ${SIGNALLING_SFU_PORT:8890}
+    http-port: ${SIGNALLING_HTTP_PORT:8080}
+    max-subscribers: ${SIGNALLING_MAX_SUBSCRIBERS:100}
+    enable-sfu: ${SIGNALLING_ENABLE_SFU:true}
+
+  security:
+    enable-auth: ${SIGNALLING_ENABLE_AUTH:false}
+    auth-token: ${SIGNALLING_AUTH_TOKEN:}
+    rate-limit-per-minute: ${SIGNALLING_RATE_LIMIT:60}
+    enable-cors: ${SIGNALLING_ENABLE_CORS:true}
+    allowed-origins: ${SIGNALLING_ALLOWED_ORIGINS:*}
+
+  websocket:
+    max-frame-size: ${SIGNALLING_MAX_FRAME_SIZE:65536}
+    ping-interval-seconds: ${SIGNALLING_PING_INTERVAL:30}
+    connection-timeout-seconds: ${SIGNALLING_CONNECTION_TIMEOUT:60}
+
+  api:
+    base-path: ${SIGNALLING_API_BASE_PATH:/api}
+    enable-health-endpoint: ${SIGNALLING_ENABLE_HEALTH:true}
+    enable-stats-endpoint: ${SIGNALLING_ENABLE_STATS:true}
+    enable-connections-endpoint: ${SIGNALLING_ENABLE_CONNECTIONS:true}
+    enable-config-endpoint: ${SIGNALLING_ENABLE_CONFIG:false}
+
+# Spring Boot Configuration
+spring:
+  application:
+    name: pixelstreaming-signalling
+  
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:default}
+
+# Logging Configuration
+logging:
+  level:
+    com.epicgames.pixelstreaming: ${SIGNALLING_LOG_LEVEL:INFO}
+    io.netty: WARN
+    org.springframework: WARN
+    root: WARN
+  
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  
+  file:
+    name: ${SIGNALLING_LOG_FILE:logs/signalling.log}
+
+# Management and Monitoring
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+      base-path: /actuator
+  
+  endpoint:
+    health:
+      show-details: when-authorized
+    
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    
+  health:
+    defaults:
+      enabled: true
+
+# Server Configuration (for REST API)
+server:
+  port: ${SIGNALLING_HTTP_PORT:8080}
+  servlet:
+    context-path: /
