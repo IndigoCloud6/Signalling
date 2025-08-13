@@ -1,0 +1,41 @@
+-------------------------------------------------------------------------------
+Test set: com.example.signalling.SignallingIntegrationTest
+-------------------------------------------------------------------------------
+Tests run: 5, Failures: 3, Errors: 0, Skipped: 0, Time elapsed: 10.93 s <<< FAILURE! -- in com.example.signalling.SignallingIntegrationTest
+com.example.signalling.SignallingIntegrationTest.testPlayerRegistrationWithInvalidStreamer -- Time elapsed: 3.871 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Should receive error within 3 seconds ==> expected: <true> but was: <false>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertTrue.failNotTrue(AssertTrue.java:63)
+	at org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:36)
+	at org.junit.jupiter.api.Assertions.assertTrue(Assertions.java:214)
+	at com.example.signalling.SignallingIntegrationTest.testPlayerRegistrationWithInvalidStreamer(SignallingIntegrationTest.java:130)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+
+com.example.signalling.SignallingIntegrationTest.testInvalidJsonHandling -- Time elapsed: 3.007 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Should receive error within 3 seconds ==> expected: <true> but was: <false>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertTrue.failNotTrue(AssertTrue.java:63)
+	at org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:36)
+	at org.junit.jupiter.api.Assertions.assertTrue(Assertions.java:214)
+	at com.example.signalling.SignallingIntegrationTest.testInvalidJsonHandling(SignallingIntegrationTest.java:285)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+
+com.example.signalling.SignallingIntegrationTest.testAnswerForwarding -- Time elapsed: 0.507 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <answer> but was: <error>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:177)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1145)
+	at com.example.signalling.SignallingIntegrationTest.testAnswerForwarding(SignallingIntegrationTest.java:194)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+
