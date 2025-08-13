@@ -1,0 +1,27 @@
+server:
+  port: 9090
+
+spring:
+  application:
+    name: java-signalling
+
+signalling:
+  staleTimeoutMs: 60000
+  cleanupIntervalMs: 10000
+  rateLimit:
+    windowSeconds: 10
+    maxMessages: 100
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, prometheus
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    com.example.signalling: INFO
+    org.springframework.web.reactive.socket: DEBUG
