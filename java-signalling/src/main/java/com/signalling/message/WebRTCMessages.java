@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * Ping message for connection health checks.
  */
-public class PingMessage extends BaseMessage {
+class PingMessage extends BaseMessage {
     
     @JsonProperty("time")
     private long time;

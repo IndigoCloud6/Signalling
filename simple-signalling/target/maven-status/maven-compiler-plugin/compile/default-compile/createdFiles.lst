@@ -1,0 +1,3 @@
+com/signalling/config/WebSocketConfig.class
+com/signalling/handler/SimpleWebSocketHandler.class
+com/signalling/SimpleSignallingServerApplication.class

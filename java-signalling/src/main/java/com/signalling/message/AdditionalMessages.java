@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * Data channel request message.
  */
-public class DataChannelRequestMessage extends BaseMessage {
+class DataChannelRequestMessage extends BaseMessage {
     
     public DataChannelRequestMessage() {
         super("dataChannelRequest");

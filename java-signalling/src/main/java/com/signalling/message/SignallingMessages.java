@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * Message sent by players to subscribe to a streamer.
  */
-public class SubscribeMessage extends BaseMessage {
+class SubscribeMessage extends BaseMessage {
     
     @JsonProperty("streamerId")
     private String streamerId;
