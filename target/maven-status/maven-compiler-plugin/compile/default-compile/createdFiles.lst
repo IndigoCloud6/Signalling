@@ -1,0 +1,14 @@
+com/epicgames/pixelstreaming/signalling/registry/ConnectionRegistryListener.class
+com/epicgames/pixelstreaming/signalling/model/ConnectionAttributes.class
+com/epicgames/pixelstreaming/signalling/SignallingApplication.class
+com/epicgames/pixelstreaming/signalling/factory/ConnectionHandlerFactory$1.class
+com/epicgames/pixelstreaming/signalling/connection/PlayerConnectionHandler.class
+com/epicgames/pixelstreaming/signalling/registry/ConnectionRegistry.class
+com/epicgames/pixelstreaming/signalling/connection/AbstractConnectionHandler.class
+com/epicgames/pixelstreaming/signalling/factory/ConnectionHandlerFactory.class
+com/epicgames/pixelstreaming/signalling/connection/SFUConnectionHandler.class
+com/epicgames/pixelstreaming/signalling/connection/ConnectionHandler.class
+com/epicgames/pixelstreaming/signalling/util/UrlParser.class
+com/epicgames/pixelstreaming/signalling/connection/StreamerConnectionHandler.class
+com/epicgames/pixelstreaming/signalling/model/ConnectionAttributes$ConnectionType.class
+com/epicgames/pixelstreaming/signalling/model/ConnectionAttributes$Builder.class
