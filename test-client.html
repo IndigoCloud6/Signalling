@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Streaming Signalling Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .connection-test {
+            border: 1px solid #ccc;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .controls {
+            margin: 10px 0;
+        }
+        button {
+            margin: 5px;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .connect { background-color: #4CAF50; color: white; }
+        .disconnect { background-color: #f44336; color: white; }
+        .send { background-color: #2196F3; color: white; }
+        .log {
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            padding: 10px;
+            height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        input[type="text"] {
+            width: 300px;
+            padding: 5px;
+        }
+        .status {
+            font-weight: bold;
+            padding: 5px;
+            border-radius: 3px;
+            margin: 5px 0;
+        }
+        .connected { background-color: #d4edda; color: #155724; }
+        .disconnected { background-color: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <h1>Pixel Streaming Signalling Server Test</h1>
+    <p>Test the Java WebSocket signalling server with different connection types.</p>
+
+    <!-- Streamer Connection Test -->
+    <div class="connection-test">
+        <h3>Streamer Connection</h3>
+        <div class="controls">
+            <input type="text" id="streamerUrl" value="ws://127.0.0.1:8888/type=streamer&insid=675ba9d5b1796fc2539d3930&projectid=6821C61B48A925890040C3B3849B06C3" placeholder="WebSocket URL">
+            <br>
+            <button class="connect" onclick="connectStreamer()">Connect</button>
+            <button class="disconnect" onclick="disconnectStreamer()">Disconnect</button>
+            <button class="send" onclick="sendStreamerMessage()">Send Ping</button>
+        </div>
+        <div id="streamerStatus" class="status disconnected">Disconnected</div>
+        <div id="streamerLog" class="log"></div>
+    </div>
+
+    <!-- Player Connection Test -->
+    <div class="connection-test">
+        <h3>Player Connection</h3>
+        <div class="controls">
+            <input type="text" id="playerUrl" value="ws://127.0.0.1:8888/type=player&insid=123456&projectid=ABCDEF" placeholder="WebSocket URL">
+            <br>
+            <button class="connect" onclick="connectPlayer()">Connect</button>
+            <button class="disconnect" onclick="disconnectPlayer()">Disconnect</button>
+            <button class="send" onclick="sendPlayerMessage()">Send List Streamers</button>
+        </div>
+        <div id="playerStatus" class="status disconnected">Disconnected</div>
+        <div id="playerLog" class="log"></div>
+    </div>
+
+    <!-- SFU Connection Test -->
+    <div class="connection-test">
+        <h3>SFU Connection</h3>
+        <div class="controls">
+            <input type="text" id="sfuUrl" value="ws://127.0.0.1:8888/type=sfu&insid=sfu001&projectid=TESTPROJECT" placeholder="WebSocket URL">
+            <br>
+            <button class="connect" onclick="connectSFU()">Connect</button>
+            <button class="disconnect" onclick="disconnectSFU()">Disconnect</button>
+            <button class="send" onclick="sendSFUMessage()">Send Ping</button>
+        </div>
+        <div id="sfuStatus" class="status disconnected">Disconnected</div>
+        <div id="sfuLog" class="log"></div>
+    </div>
+
+    <script>
+        let streamerWs = null;
+        let playerWs = null;
+        let sfuWs = null;
+
+        function log(elementId, message) {
+            const logElement = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            logElement.innerHTML += `[${timestamp}] ${message}\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+
+        function updateStatus(elementId, connected) {
+            const statusElement = document.getElementById(elementId);
+            if (connected) {
+                statusElement.textContent = 'Connected';
+                statusElement.className = 'status connected';
+            } else {
+                statusElement.textContent = 'Disconnected';
+                statusElement.className = 'status disconnected';
+            }
+        }
+
+        // Streamer functions
+        function connectStreamer() {
+            const url = document.getElementById('streamerUrl').value;
+            streamerWs = new WebSocket(url);
+            
+            streamerWs.onopen = function() {
+                log('streamerLog', 'Connected to streamer WebSocket');
+                updateStatus('streamerStatus', true);
+            };
+            
+            streamerWs.onmessage = function(event) {
+                log('streamerLog', 'Received: ' + event.data);
+            };
+            
+            streamerWs.onclose = function() {
+                log('streamerLog', 'Streamer connection closed');
+                updateStatus('streamerStatus', false);
+            };
+            
+            streamerWs.onerror = function(error) {
+                log('streamerLog', 'Error: ' + error);
+                updateStatus('streamerStatus', false);
+            };
+        }
+
+        function disconnectStreamer() {
+            if (streamerWs) {
+                streamerWs.close();
+                streamerWs = null;
+            }
+        }
+
+        function sendStreamerMessage() {
+            if (streamerWs && streamerWs.readyState === WebSocket.OPEN) {
+                const message = {
+                    type: 'ping',
+                    time: Date.now()
+                };
+                streamerWs.send(JSON.stringify(message));
+                log('streamerLog', 'Sent: ' + JSON.stringify(message));
+            } else {
+                log('streamerLog', 'Not connected');
+            }
+        }
+
+        // Player functions
+        function connectPlayer() {
+            const url = document.getElementById('playerUrl').value;
+            playerWs = new WebSocket(url);
+            
+            playerWs.onopen = function() {
+                log('playerLog', 'Connected to player WebSocket');
+                updateStatus('playerStatus', true);
+            };
+            
+            playerWs.onmessage = function(event) {
+                log('playerLog', 'Received: ' + event.data);
+            };
+            
+            playerWs.onclose = function() {
+                log('playerLog', 'Player connection closed');
+                updateStatus('playerStatus', false);
+            };
+            
+            playerWs.onerror = function(error) {
+                log('playerLog', 'Error: ' + error);
+                updateStatus('playerStatus', false);
+            };
+        }
+
+        function disconnectPlayer() {
+            if (playerWs) {
+                playerWs.close();
+                playerWs = null;
+            }
+        }
+
+        function sendPlayerMessage() {
+            if (playerWs && playerWs.readyState === WebSocket.OPEN) {
+                const message = {
+                    type: 'listStreamers'
+                };
+                playerWs.send(JSON.stringify(message));
+                log('playerLog', 'Sent: ' + JSON.stringify(message));
+            } else {
+                log('playerLog', 'Not connected');
+            }
+        }
+
+        // SFU functions
+        function connectSFU() {
+            const url = document.getElementById('sfuUrl').value;
+            sfuWs = new WebSocket(url);
+            
+            sfuWs.onopen = function() {
+                log('sfuLog', 'Connected to SFU WebSocket');
+                updateStatus('sfuStatus', true);
+            };
+            
+            sfuWs.onmessage = function(event) {
+                log('sfuLog', 'Received: ' + event.data);
+            };
+            
+            sfuWs.onclose = function() {
+                log('sfuLog', 'SFU connection closed');
+                updateStatus('sfuStatus', false);
+            };
+            
+            sfuWs.onerror = function(error) {
+                log('sfuLog', 'Error: ' + error);
+                updateStatus('sfuStatus', false);
+            };
+        }
+
+        function disconnectSFU() {
+            if (sfuWs) {
+                sfuWs.close();
+                sfuWs = null;
+            }
+        }
+
+        function sendSFUMessage() {
+            if (sfuWs && sfuWs.readyState === WebSocket.OPEN) {
+                const message = {
+                    type: 'ping',
+                    time: Date.now()
+                };
+                sfuWs.send(JSON.stringify(message));
+                log('sfuLog', 'Sent: ' + JSON.stringify(message));
+            } else {
+                log('sfuLog', 'Not connected');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+# Signalling Server Configuration
+server:
+  port: 8080  # Spring Boot management port (different from WebSocket port)
+
+signalling:
+  server:
+    port: 8888  # WebSocket server port
+    max-subscribers: 100
+    cors-enabled: true
+    cors-origin: "*"
+  protocol:
+    version: "1.0"
+    ping-interval-ms: 30000
+    connection-timeout-ms: 60000
+
+logging:
+  level:
+    com.epicgames.pixelstreaming: DEBUG
+    io.netty: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

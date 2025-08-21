@@ -25,10 +25,13 @@ public abstract class AbstractConnectionHandler implements ConnectionHandler {
     private final String remoteAddress;
     private final AtomicBoolean active = new AtomicBoolean(false);
     
+    // Store the channel context for message sending
+    private volatile ChannelHandlerContext channelContext;
+    
     protected AbstractConnectionHandler(ConnectionAttributes attributes, String remoteAddress) {
-        this.connectionId = generateConnectionId();
         this.attributes = attributes;
         this.remoteAddress = remoteAddress;
+        this.connectionId = generateConnectionId();
     }
     
     @Override
@@ -48,6 +51,7 @@ public abstract class AbstractConnectionHandler implements ConnectionHandler {
     
     @Override
     public void onConnectionEstablished(ChannelHandlerContext ctx) {
+        this.channelContext = ctx;
         active.set(true);
         logger.info("Connection established: {} {} from {}", 
                    getAttributes().getType(), getConnectionId(), getRemoteAddress());
@@ -71,6 +75,7 @@ public abstract class AbstractConnectionHandler implements ConnectionHandler {
     @Override
     public void onConnectionClosed(ChannelHandlerContext ctx) {
         active.set(false);
+        this.channelContext = null;
         logger.info("Connection closed: {} {} from {}", 
                    getAttributes().getType(), getConnectionId(), getRemoteAddress());
     }
@@ -93,9 +98,11 @@ public abstract class AbstractConnectionHandler implements ConnectionHandler {
     
     @Override
     public void sendTextMessage(ChannelHandlerContext ctx, String message) {
-        if (ctx != null && ctx.channel().isActive()) {
+        ChannelHandlerContext contextToUse = ctx != null ? ctx : this.channelContext;
+        
+        if (contextToUse != null && contextToUse.channel().isActive()) {
             logger.debug("Sending message to {}: {}", getConnectionId(), message);
-            ctx.writeAndFlush(new TextWebSocketFrame(message));
+            contextToUse.writeAndFlush(new TextWebSocketFrame(message));
         } else {
             logger.warn("Cannot send message to {}: channel is not active", getConnectionId());
         }
@@ -104,6 +111,15 @@ public abstract class AbstractConnectionHandler implements ConnectionHandler {
     @Override
     public boolean isActive() {
         return active.get();
+    }
+    
+    /**
+     * Gets the stored channel context for this connection.
+     * 
+     * @return The channel context, or null if not available
+     */
+    public ChannelHandlerContext getChannelContext() {
+        return channelContext;
     }
     
     /**
